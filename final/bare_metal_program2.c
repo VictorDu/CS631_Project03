@@ -189,16 +189,20 @@ void counter_print(void)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
 int data[WRITE_DATA_SIZE] ;
-void write_prog1(int loopNumner, int size){
-    int i,j;
+
+void write_prog2(int loopNumner, int size){
+    int i,j,k;
     for(i = 0;i<loopNumner;++i){
 	//reset();
-	counter_start();
-	for (j = size - 1; j >= 0; j--)
+	for (k = 0; k < 4096; ++k)
 	{
-	    (*(data + j))++;
+	    counter_start();
+	    for (j = k; j < size; j=j+4096)
+	    {
+		(*(data + j))++;
+	    }
+	    counter_stop();
 	}
-	counter_stop();
     }
     counter_print();
     return;
@@ -215,10 +219,10 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     uart_puts("enter\r\n"); 
     int j;
-    uart_puts("Program1\r\n"); 
+    uart_puts("Program2\r\n"); 
     for(j = 1; j<=10000; j = j*10){
 	freshMemory(WRITE_DATA_SIZE);
-	write_prog1(j,WRITE_DATA_SIZE);
+	write_prog2(j,WRITE_DATA_SIZE);
     }
     uart_puts("exit\r\n"); 
     return 0;
